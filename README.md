@@ -35,6 +35,12 @@ The workflow will automatically:
 - **Model**: `whisky_inventory` with 16 fields including distillery, age, region, and cask type
 - **Quality checks**: Freshness, completeness, uniqueness, and validity rules for whisky-specific attributes
 
+### Dog Inventory
+- **File**: [dog-inventory-contract.yaml](dog-inventory-contract.yaml)
+- **Description**: Tracks dog inventory for animal shelter or rescue, including dog details, health records, and adoption status
+- **Model**: `dog_inventory` with 17 fields including breed, age, health status, and adoption information
+- **Quality checks**: Freshness, completeness, uniqueness, and validity rules for dog-specific attributes
+
 ## 🛠️ Local Development
 
 ### Generate catalog locally
