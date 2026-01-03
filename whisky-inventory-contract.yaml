@@ -1,0 +1,159 @@
+dataContractSpecification: 1.2.1
+id: whisky-inventory-contract
+info:
+  title: Whisky Inventory Data Contract
+  version: 1.0.0
+  description: Data contract for whisky inventory management system tracking stock levels, product details, and storage conditions
+  owner: Inventory Management Team
+  contact:
+    name: Data Team
+    email: data-team@company.com
+
+servers:
+  production:
+    type: snowflake
+    account: my-account
+    database: INVENTORY_DB
+    schema: WHISKY
+
+terms:
+  usage: Data can be used for inventory management, reporting, and analytics purposes
+  limitations: Do not use for external distribution without approval
+  billing: Charged based on Snowflake compute usage
+  noticePeriod: P30D
+
+models:
+  whisky_inventory:
+    description: Main table containing whisky inventory stock and product information
+    type: table
+    fields:
+      whisky_id:
+        type: varchar
+        description: Unique identifier for each whisky product
+        required: true
+        unique: true
+        primary: true
+      whisky_name:
+        type: varchar
+        description: Commercial name of the whisky
+        required: true
+        example: Lagavulin 16 Year Old
+      whisky_type:
+        type: varchar
+        description: Category of whisky (single malt, blended, bourbon, rye, etc.)
+        required: true
+        example: single malt
+      distillery:
+        type: varchar
+        description: Name of the distillery that produced the whisky
+        required: true
+        example: Lagavulin Distillery
+      origin_region:
+        type: varchar
+        description: Region or country where the whisky is produced
+        required: false
+        example: Islay, Scotland
+      age_years:
+        type: integer
+        description: Age statement in years (if applicable)
+        required: false
+        example: 16
+      alcohol_percentage:
+        type: decimal
+        description: Alcohol by volume percentage
+        required: true
+        example: 43.0
+      quantity_in_stock:
+        type: integer
+        description: Current quantity in stock (bottles)
+        required: true
+        example: 75
+      unit_of_measure:
+        type: varchar
+        description: Unit of measurement for inventory (bottles, cases, barrels)
+        required: true
+        example: bottles
+      bottle_size_ml:
+        type: integer
+        description: Size of the bottle in milliliters
+        required: true
+        example: 750
+      unit_price:
+        type: decimal
+        description: Price per unit in USD
+        required: true
+        example: 89.99
+      storage_location:
+        type: varchar
+        description: Warehouse location or zone where whisky is stored
+        required: true
+        example: SPIRITS-B-08
+      storage_temperature:
+        type: decimal
+        description: Storage temperature in Celsius
+        required: true
+        example: 18.0
+      vintage_year:
+        type: integer
+        description: Year the whisky was distilled (if applicable)
+        required: false
+        example: 2005
+      cask_type:
+        type: varchar
+        description: Type of cask used for aging (ex-bourbon, sherry, wine, etc.)
+        required: false
+        example: ex-bourbon
+      last_updated:
+        type: timestamp
+        description: Timestamp when the record was last updated
+        required: true
+        example: 2026-01-03T10:30:00Z
+
+quality:
+  type: SodaCL
+  specification:
+    checks for whisky_inventory:
+      # Freshness - data should be updated daily
+      - freshness(last_updated) < 1d
+      # Completeness - critical fields must not be null
+      - missing_count(whisky_id) = 0
+      - missing_count(whisky_name) = 0
+      - missing_count(distillery) = 0
+      - missing_count(quantity_in_stock) = 0
+      - missing_count(unit_price) = 0
+      # Uniqueness - whisky_id must be unique
+      - duplicate_count(whisky_id) = 0
+      # Validity - check value constraints
+      - invalid_count(whisky_type) = 0:
+          valid values: ['single malt', 'blended', 'bourbon', 'rye', 'irish', 'canadian', 'japanese', 'single grain']
+      - min(quantity_in_stock) >= 0
+      - min(unit_price) > 0
+      - min(alcohol_percentage) >= 0
+      - max(alcohol_percentage) <= 100
+      - invalid_count(unit_of_measure) = 0:
+          valid values: ['bottles', 'cases', 'barrels', 'liters']
+      - min(bottle_size_ml) > 0
+      - invalid_count(bottle_size_ml) = 0:
+          valid values: [50, 200, 375, 500, 700, 750, 1000, 1750]
+
+servicelevels:
+  availability:
+    description: The data is available 99.9% of the time during business hours
+    percentage: 99.9%
+  retention:
+    description: Historical inventory data is retained for 5 years for audit purposes
+    period: P5Y
+    unlimited: false
+  freshness:
+    description: Inventory data is updated daily at 2 AM UTC
+    threshold: 24h
+    timestampField: whisky_inventory.last_updated
+  frequency:
+    description: Data is refreshed daily via batch process
+    type: batch
+    interval: daily
+    cron: 0 2 * * *
+  support:
+    description: Support available during business hours
+    time: 9am to 5pm EST on business days
+    responseTime: 4h

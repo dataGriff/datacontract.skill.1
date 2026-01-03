@@ -24,10 +24,16 @@ The workflow will automatically:
 ## 📝 Data Contracts
 
 ### Cheese Inventory
-- **File**: [datacontract.yaml](datacontract.yaml)
+- **File**: [cheese-inventory-contract.yaml](cheese-inventory-contract.yaml)
 - **Description**: Tracks cheese inventory stock levels, product details, and storage conditions
 - **Model**: `cheese_inventory` with 12 fields
 - **Quality checks**: Freshness, completeness, uniqueness, and validity rules
+
+### Whisky Inventory
+- **File**: [whisky-inventory-contract.yaml](whisky-inventory-contract.yaml)
+- **Description**: Tracks whisky inventory stock levels, product details, and storage conditions
+- **Model**: `whisky_inventory` with 16 fields including distillery, age, region, and cask type
+- **Quality checks**: Freshness, completeness, uniqueness, and validity rules for whisky-specific attributes
 
 ## 🛠️ Local Development
 
