@@ -105,6 +105,8 @@ datacontract export cheese-inventory-datacontract.yaml --format jsonschema
 datacontract export cheese-inventory-datacontract.yaml --format dbt
 ```
 
+**Note**: An example JSON Schema export is included in `cheese-inventory-schema.json`. Note that the datacontract CLI may add custom properties (like `unique`) that are not part of the standard JSON Schema specification.
+
 ## Data Location
 
 **Production**: `./data/cheese_inventory.parquet`
