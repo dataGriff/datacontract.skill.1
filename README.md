@@ -38,8 +38,11 @@ The workflow will automatically:
 ### Dog Inventory
 - **File**: [dog-inventory-contract.yaml](dog-inventory-contract.yaml)
 - **Description**: Tracks dog inventory for animal shelter or rescue, including dog details, health records, and adoption status
-- **Model**: `dog_inventory` with 17 fields including breed, age, health status, and adoption information
-- **Quality checks**: Freshness, completeness, uniqueness, and validity rules for dog-specific attributes
+- **Models**: 
+  - `dog_inventory` with 18 fields including breed, age, health status, adoption information, and rescue organization
+  - `rescues` with 9 fields containing rescue organization information
+- **Relationships**: Each dog references a rescue organization via the `rescue_id` foreign key
+- **Quality checks**: Freshness, completeness, uniqueness, and validity rules for dog-specific attributes and rescue information
 
 ## 🛠️ Local Development
 
