@@ -23,6 +23,58 @@ terms:
   noticePeriod: P30D
 
 models:
+  rescues:
+    description: Table containing rescue organization information
+    type: table
+    fields:
+      rescue_id:
+        type: varchar
+        description: Unique identifier for each rescue organization
+        required: true
+        unique: true
+        primary: true
+        example: RESCUE-001
+      rescue_name:
+        type: varchar
+        description: Name of the rescue organization
+        required: true
+        example: Happy Tails Rescue
+      rescue_location:
+        type: varchar
+        description: City or region where the rescue is located
+        required: true
+        example: San Francisco, CA
+      rescue_contact_email:
+        type: varchar
+        description: Contact email for the rescue organization
+        required: true
+        example: contact@happytails.org
+      rescue_contact_phone:
+        type: varchar
+        description: Contact phone number for the rescue organization
+        required: false
+        example: 555-0123
+      rescue_website:
+        type: varchar
+        description: Website URL of the rescue organization
+        required: false
+        example: https://happytails.org
+      rescue_type:
+        type: varchar
+        description: Type of rescue organization
+        required: true
+        example: non-profit
+      established_date:
+        type: date
+        description: Date when the rescue was established
+        required: false
+        example: 2015-03-15
+      last_updated:
+        type: timestamp
+        description: Timestamp when the record was last updated
+        required: true
+        example: 2026-01-03T10:30:00Z
+
   dog_inventory:
     description: Main table containing dog inventory and adoption information
     type: table
@@ -33,6 +85,12 @@ models:
         required: true
         unique: true
         primary: true
+      rescue_id:
+        type: varchar
+        description: Identifier of the rescue organization the dog came from
+        required: true
+        references: rescues.rescue_id
+        example: RESCUE-001
       dog_name:
         type: varchar
         description: Name of the dog
@@ -117,11 +175,27 @@ models:
 quality:
   type: SodaCL
   specification:
+    checks for rescues:
+      # Freshness - data should be updated daily
+      - freshness(last_updated) < 1d
+      # Completeness - critical fields must not be null
+      - missing_count(rescue_id) = 0
+      - missing_count(rescue_name) = 0
+      - missing_count(rescue_location) = 0
+      - missing_count(rescue_contact_email) = 0
+      - missing_count(rescue_type) = 0
+      # Uniqueness - rescue_id must be unique
+      - duplicate_count(rescue_id) = 0
+      # Validity - check value constraints
+      - invalid_count(rescue_type) = 0:
+          valid values: ['non-profit', 'government', 'private', 'volunteer']
+    
     checks for dog_inventory:
       # Freshness - data should be updated daily
       - freshness(last_updated) < 1d
       # Completeness - critical fields must not be null
       - missing_count(dog_id) = 0
+      - missing_count(rescue_id) = 0
       - missing_count(dog_name) = 0
       - missing_count(breed) = 0
       - missing_count(age_years) = 0
