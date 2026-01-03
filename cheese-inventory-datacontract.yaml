@@ -1,0 +1,201 @@
+dataContractSpecification: 1.2.1
+id: cheese-inventory-data-contract
+info:
+  title: Cheese Inventory Data Contract
+  version: 1.0.0
+  description: Data contract for managing cheese inventory including cheese types, quantities, aging information, and storage locations
+  owner: Inventory Management Team
+  contact:
+    name: Cheese Operations
+    email: cheese-ops@example.com
+
+
+### servers
+
+servers:
+  production:
+    type: local
+    location: ./data/cheese_inventory.parquet
+    format: parquet
+
+### terms
+
+terms:
+  usage: This data is intended for internal inventory management and reporting purposes
+  limitations: Data should not be shared externally without proper authorization
+  billing: No billing associated with this dataset
+  noticePeriod: 30 days
+
+
+### models
+
+models:
+  cheese_inventory:
+    description: Main table containing cheese inventory data
+    type: table
+    fields:
+      cheese_id:
+        type: string
+        description: Unique identifier for each cheese item
+        required: true
+        unique: true
+        primary: true
+      cheese_name:
+        type: string
+        description: Name of the cheese (e.g., Cheddar, Brie, Gouda)
+        required: true
+      cheese_type:
+        type: string
+        description: Category of cheese (e.g., Hard, Soft, Semi-soft, Blue)
+        required: true
+      origin_country:
+        type: string
+        description: Country of origin for the cheese
+        required: false
+      milk_type:
+        type: string
+        description: Type of milk used (e.g., Cow, Goat, Sheep, Buffalo)
+        required: true
+      quantity_kg:
+        type: decimal
+        description: Current quantity in stock measured in kilograms
+        required: true
+      unit_price:
+        type: decimal
+        description: Price per kilogram in USD
+        required: true
+      aging_months:
+        type: integer
+        description: Number of months the cheese has been aged
+        required: false
+      production_date:
+        type: date
+        description: Date when the cheese was produced
+        required: true
+      expiry_date:
+        type: date
+        description: Expected expiry date of the cheese
+        required: true
+      storage_location:
+        type: string
+        description: Physical location where the cheese is stored (e.g., Warehouse A, Cold Room 3)
+        required: true
+      temperature_celsius:
+        type: decimal
+        description: Current storage temperature in Celsius
+        required: true
+      humidity_percent:
+        type: decimal
+        description: Current storage humidity percentage
+        required: true
+      last_updated:
+        type: timestamp
+        description: Timestamp of the last inventory update
+        required: true
+
+
+### definitions
+
+definitions:
+  cheese_types:
+    description: Valid cheese type categories
+    type: string
+    enum:
+      - Hard
+      - Semi-hard
+      - Semi-soft
+      - Soft
+      - Blue
+      - Fresh
+  milk_types:
+    description: Valid milk type sources
+    type: string
+    enum:
+      - Cow
+      - Goat
+      - Sheep
+      - Buffalo
+      - Mixed
+
+
+### servicelevels
+
+servicelevels:
+  availability:
+    description: The inventory system is available 24/7 with 99.9% uptime
+    percentage: 99.9%
+  retention:
+    description: Data is retained for 7 years for regulatory compliance
+    period: P7Y
+    unlimited: false
+  freshness:
+    description: Inventory data is updated in real-time
+    threshold: 1h
+    timestampField: cheese_inventory.last_updated
+  frequency:
+    description: Data is continuously updated in real-time
+    type: streaming
+  support:
+    description: Support available 24/7 for critical inventory issues
+    time: 24/7
+    responseTime: 15m
+
+### quality
+
+quality:
+  type: SodaCL
+  specification:
+    checks for cheese_inventory:
+      # Uniqueness checks
+      - duplicate_count(cheese_id) = 0:
+          name: Cheese ID must be unique
+      
+      # Completeness checks
+      - missing_count(cheese_id) = 0:
+          name: Cheese ID is required
+      - missing_count(cheese_name) = 0:
+          name: Cheese name is required
+      - missing_count(cheese_type) = 0:
+          name: Cheese type is required
+      - missing_count(milk_type) = 0:
+          name: Milk type is required
+      - missing_count(quantity_kg) = 0:
+          name: Quantity is required
+      - missing_count(unit_price) = 0:
+          name: Unit price is required
+      - missing_count(production_date) = 0:
+          name: Production date is required
+      - missing_count(expiry_date) = 0:
+          name: Expiry date is required
+      - missing_count(storage_location) = 0:
+          name: Storage location is required
+      - missing_count(temperature_celsius) = 0:
+          name: Storage temperature is required
+      - missing_count(humidity_percent) = 0:
+          name: Storage humidity is required
+      - missing_count(last_updated) = 0:
+          name: Last updated timestamp is required
+      
+      # Validity checks
+      - values in (cheese_type) must be in ['Hard', 'Semi-hard', 'Semi-soft', 'Soft', 'Blue', 'Fresh']:
+          name: Cheese type must be valid category
+      - values in (milk_type) must be in ['Cow', 'Goat', 'Sheep', 'Buffalo', 'Mixed']:
+          name: Milk type must be valid source
+      - min(quantity_kg) >= 0:
+          name: Quantity cannot be negative
+      - min(unit_price) > 0:
+          name: Unit price must be positive
+      - min(aging_months) >= 0:
+          name: Aging months cannot be negative
+      - min(temperature_celsius) >= -10:
+          name: Storage temperature must be within reasonable range
+      - max(temperature_celsius) <= 25:
+          name: Storage temperature must not exceed safe limits
+      - min(humidity_percent) >= 0:
+          name: Humidity percentage cannot be negative
+      - max(humidity_percent) <= 100:
+          name: Humidity percentage cannot exceed 100
+      
+      # Freshness check
+      - freshness(last_updated) < 1h:
+          name: Data should be updated within the last hour
