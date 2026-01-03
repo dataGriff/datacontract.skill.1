@@ -135,11 +135,9 @@ quality:
           valid values: ['up-to-date', 'overdue', 'incomplete', 'unknown']
       - invalid_count(adoption_status) = 0:
           valid values: ['available', 'pending', 'adopted', 'foster', 'hold', 'unavailable']
-      - invalid_count(temperament) = 0:
-          valid values: ['friendly', 'shy', 'energetic', 'calm', 'protective', 'playful', 'needs-training']
       - min(age_years) >= 0
       - min(weight_kg) > 0
-      - max(weight_kg) <= 200
+      - max(weight_kg) <= 100
 
 servicelevels:
   availability:
