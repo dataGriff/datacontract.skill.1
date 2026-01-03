@@ -6,7 +6,7 @@ description: Create, validate, test, and manage data contracts using the Open Da
 # Data Contract Management
 
 ## Overview
-This skill helps you work with data contracts following the Open Data Contract Specification (ODCS). You can execute the datacontract CLI directly to create, validate, test, and export data contracts.
+This skill helps you work with data contracts following the Open Data Contract Specification (ODCS). You can execute the datacontract CLI directly to create, lint, test, and export data contracts.
 
 ## When to Use This Skill
 - Creating new data contracts
@@ -20,11 +20,11 @@ This skill helps you work with data contracts following the Open Data Contract S
 
 ### Core Commands
 - `datacontract init [--template PLATFORM]` - Initialize a new data contract
-- `datacontract validate CONTRACT.yaml` - Validate against ODCS spec
-- `datacontract test CONTRACT.yaml` - Run data quality tests
-- `datacontract export CONTRACT.yaml --format FORMAT` - Export to other formats
-- `datacontract lint CONTRACT.yaml` - Check for best practices
-- `datacontract breaking CONTRACT.yaml CONTRACT_v2.yaml` - Check for breaking changes
+- `datacontract lint {description}-CONTRACT.yaml` - Validate against ODCS spec
+- `datacontract test {description}-CONTRACT.yaml` - Run data quality tests
+- `datacontract export {description}-CONTRACT.yaml --format FORMAT` - Export to other formats
+- `datacontract lint {description}-CONTRACT.yaml` - Check for best practices
+- `datacontract breaking {description}-CONTRACT.yaml CONTRACT_v2.yaml` - Check for breaking changes
 
 ### Supported Platforms
 Templates available: snowflake, bigquery, redshift, databricks, postgres, s3, local
@@ -66,9 +66,9 @@ Edit the generated YAML to include:
 - Quality rules based on requirements
 - SLA specifications
 
-**Step 4: Validate**
+**Step 4: Lint**
 ```bash
-datacontract validate contract.yaml
+datacontract lint {description}-contract.yaml
 ```
 Always validate after creation or any modifications.
 
@@ -95,7 +95,7 @@ When validation fails, follow this pattern:
 ### Testing Data Quality
 
 ```bash
-datacontract test contract.yaml
+datacontract test {description}-contract.yaml
 ```
 
 Tests validate that actual data meets the quality rules defined in the contract. This requires:
@@ -205,9 +205,9 @@ Data meets expected patterns:
 
 Generate platform-specific artifacts:
 ```bash
-datacontract export contract.yaml --format dbt
-datacontract export contract.yaml --format sql
-datacontract export contract.yaml --format great-expectations
+datacontract export {description}-contract.yaml --format dbt
+datacontract export {description}-contract.yaml --format sql
+datacontract export {description}-contract.yaml --format great-expectations
 ```
 
 Common use cases:
@@ -234,7 +234,7 @@ You should:
 2. Run: `datacontract init --template snowflake`
 3. Explain the generated structure
 4. Customize based on user's answers
-5. Run: `datacontract validate contract.yaml`
+5. Run: `datacontract lint {description}-contract.yaml`
 6. If errors, fix and re-validate
 7. Suggest quality rules based on the schema
 8. Offer to test or export as needed
