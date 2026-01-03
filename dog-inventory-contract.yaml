@@ -1,0 +1,164 @@
+dataContractSpecification: 1.2.1
+id: dog-inventory-contract
+info:
+  title: Dog Inventory Data Contract
+  version: 1.0.0
+  description: Data contract for dog inventory management system tracking dog details, health records, and adoption status
+  owner: Animal Management Team
+  contact:
+    name: Data Team
+    email: data-team@company.com
+
+servers:
+  production:
+    type: snowflake
+    account: my-account
+    database: INVENTORY_DB
+    schema: DOG
+
+terms:
+  usage: Data can be used for inventory management, reporting, and analytics purposes
+  limitations: Do not use for external distribution without approval
+  billing: Charged based on Snowflake compute usage
+  noticePeriod: P30D
+
+models:
+  dog_inventory:
+    description: Main table containing dog inventory and adoption information
+    type: table
+    fields:
+      dog_id:
+        type: varchar
+        description: Unique identifier for each dog
+        required: true
+        unique: true
+        primary: true
+      dog_name:
+        type: varchar
+        description: Name of the dog
+        required: true
+        example: Max
+      breed:
+        type: varchar
+        description: Breed or mix of breeds
+        required: true
+        example: Golden Retriever
+      age_years:
+        type: integer
+        description: Age of the dog in years
+        required: true
+        example: 3
+      weight_kg:
+        type: decimal
+        description: Weight of the dog in kilograms
+        required: true
+        example: 30.5
+      gender:
+        type: varchar
+        description: Gender of the dog
+        required: true
+        example: male
+      color:
+        type: varchar
+        description: Primary color or color pattern of the dog
+        required: true
+        example: golden
+      microchip_id:
+        type: varchar
+        description: Microchip identification number
+        required: false
+        example: 123456789012345
+      vaccination_status:
+        type: varchar
+        description: Current vaccination status
+        required: true
+        example: up-to-date
+      spayed_neutered:
+        type: boolean
+        description: Whether the dog has been spayed or neutered
+        required: true
+        example: true
+      health_condition:
+        type: varchar
+        description: Overall health condition or special needs
+        required: false
+        example: healthy
+      adoption_status:
+        type: varchar
+        description: Current adoption status
+        required: true
+        example: available
+      arrival_date:
+        type: date
+        description: Date when the dog arrived at the facility
+        required: true
+        example: 2025-11-15
+      adoption_date:
+        type: date
+        description: Date when the dog was adopted (if applicable)
+        required: false
+        example: 2026-01-02
+      kennel_location:
+        type: varchar
+        description: Location or kennel number where the dog is housed
+        required: true
+        example: KENNEL-A-05
+      temperament:
+        type: varchar
+        description: Behavioral temperament of the dog
+        required: false
+        example: friendly
+      last_updated:
+        type: timestamp
+        description: Timestamp when the record was last updated
+        required: true
+        example: 2026-01-03T10:30:00Z
+
+quality:
+  type: SodaCL
+  specification:
+    checks for dog_inventory:
+      # Freshness - data should be updated daily
+      - freshness(last_updated) < 1d
+      # Completeness - critical fields must not be null
+      - missing_count(dog_id) = 0
+      - missing_count(dog_name) = 0
+      - missing_count(breed) = 0
+      - missing_count(age_years) = 0
+      - missing_count(adoption_status) = 0
+      # Uniqueness - dog_id must be unique
+      - duplicate_count(dog_id) = 0
+      # Validity - check value constraints
+      - invalid_count(gender) = 0:
+          valid values: ['male', 'female', 'unknown']
+      - invalid_count(vaccination_status) = 0:
+          valid values: ['up-to-date', 'overdue', 'incomplete', 'unknown']
+      - invalid_count(adoption_status) = 0:
+          valid values: ['available', 'pending', 'adopted', 'foster', 'hold', 'unavailable']
+      - invalid_count(temperament) = 0:
+          valid values: ['friendly', 'shy', 'energetic', 'calm', 'protective', 'playful', 'needs-training']
+      - min(age_years) >= 0
+      - min(weight_kg) > 0
+      - max(weight_kg) <= 200
+
+servicelevels:
+  availability:
+    description: The data is available 99.9% of the time during business hours
+    percentage: 99.9%
+  retention:
+    description: Historical dog inventory data is retained for 10 years for record-keeping
+    period: P10Y
+    unlimited: false
+  freshness:
+    description: Inventory data is updated daily at 2 AM UTC
+    threshold: 24h
+    timestampField: dog_inventory.last_updated
+  frequency:
+    description: Data is refreshed daily via batch process
+    type: batch
+    interval: daily
+    cron: 0 2 * * *
+  support:
+    description: Support available during business hours
+    time: 9am to 5pm EST on business days
+    responseTime: 4h
