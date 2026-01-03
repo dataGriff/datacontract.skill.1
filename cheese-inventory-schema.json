@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "cheese_id": {
+      "type": "string",
+      "unique": true,
+      "description": "Unique identifier for each cheese item"
+    },
+    "cheese_name": {
+      "type": "string",
+      "description": "Name of the cheese (e.g., Cheddar, Brie, Gouda)"
+    },
+    "cheese_type": {
+      "type": "string",
+      "description": "Category of cheese (e.g., Hard, Soft, Semi-soft, Blue)"
+    },
+    "origin_country": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Country of origin for the cheese"
+    },
+    "milk_type": {
+      "type": "string",
+      "description": "Type of milk used (e.g., Cow, Goat, Sheep, Buffalo)"
+    },
+    "quantity_kg": {
+      "type": "number",
+      "description": "Current quantity in stock measured in kilograms"
+    },
+    "unit_price": {
+      "type": "number",
+      "description": "Price per kilogram in USD"
+    },
+    "aging_months": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Number of months the cheese has been aged"
+    },
+    "production_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date when the cheese was produced"
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Expected expiry date of the cheese"
+    },
+    "storage_location": {
+      "type": "string",
+      "description": "Physical location where the cheese is stored (e.g., Warehouse A, Cold Room 3)"
+    },
+    "temperature_celsius": {
+      "type": "number",
+      "description": "Current storage temperature in Celsius"
+    },
+    "humidity_percent": {
+      "type": "number",
+      "description": "Current storage humidity percentage"
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the last inventory update"
+    }
+  },
+  "required": [
+    "cheese_id",
+    "cheese_name",
+    "cheese_type",
+    "milk_type",
+    "quantity_kg",
+    "unit_price",
+    "production_date",
+    "expiry_date",
+    "storage_location",
+    "temperature_celsius",
+    "humidity_percent",
+    "last_updated"
+  ],
+  "description": "Main table containing cheese inventory data"
+}
