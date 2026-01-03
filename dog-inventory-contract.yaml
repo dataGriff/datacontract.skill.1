@@ -4,7 +4,7 @@ info:
   title: Dog Inventory Data Contract
   version: 1.0.0
   description: Data contract for dog inventory management system tracking dog details, health records, and adoption status
-  owner: Animal Management Team
+  owner: Inventory Management Team
   contact:
     name: Data Team
     email: data-team@company.com
@@ -146,8 +146,8 @@ servicelevels:
     description: The data is available 99.9% of the time during business hours
     percentage: 99.9%
   retention:
-    description: Historical dog inventory data is retained for 10 years for record-keeping
-    period: P10Y
+    description: Historical dog inventory data is retained for 5 years for audit purposes
+    period: P5Y
     unlimited: false
   freshness:
     description: Inventory data is updated daily at 2 AM UTC
