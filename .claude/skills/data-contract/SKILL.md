@@ -1,5 +1,5 @@
 ---
-name: data-contract-management
+name: data-contract
 description: Create, validate, test, and manage data contracts using the Open Data Contract Specification (ODCS) and the datacontract CLI. Use when working with data contracts, ODCS specifications, data quality rules, or when the user mentions datacontract CLI or data contract workflows.
 ---
 

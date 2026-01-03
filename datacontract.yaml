@@ -1,0 +1,134 @@
+dataContractSpecification: 1.2.1
+id: cheese-inventory-contract
+info:
+  title: Cheese Inventory Data Contract
+  version: 1.0.0
+  description: Data contract for cheese inventory management system tracking stock levels, product details, and storage conditions
+  owner: Inventory Management Team
+  contact:
+    name: Data Team
+    email: data-team@company.com
+
+servers:
+  production:
+    type: snowflake
+    account: my-account
+    database: INVENTORY_DB
+    schema: CHEESE
+
+terms:
+  usage: Data can be used for inventory management, reporting, and analytics purposes
+  limitations: Do not use for external distribution without approval
+  billing: Charged based on Snowflake compute usage
+  noticePeriod: P30D
+
+models:
+  cheese_inventory:
+    description: Main table containing cheese inventory stock and product information
+    type: table
+    fields:
+      cheese_id:
+        type: varchar
+        description: Unique identifier for each cheese product
+        required: true
+        unique: true
+        primary: true
+      cheese_name:
+        type: varchar
+        description: Commercial name of the cheese
+        required: true
+        example: Aged Cheddar
+      cheese_type:
+        type: varchar
+        description: Category of cheese (hard, soft, blue, etc.)
+        required: true
+        example: hard
+      origin_country:
+        type: varchar
+        description: Country where the cheese is produced
+        required: false
+        example: France
+      quantity_in_stock:
+        type: integer
+        description: Current quantity in stock (units)
+        required: true
+        example: 150
+      unit_of_measure:
+        type: varchar
+        description: Unit of measurement for inventory (kg, lbs, wheels, etc.)
+        required: true
+        example: kg
+      unit_price:
+        type: decimal
+        description: Price per unit in USD
+        required: true
+        example: 12.50
+      storage_location:
+        type: varchar
+        description: Warehouse location or zone where cheese is stored
+        required: true
+        example: COLD-A-12
+      storage_temperature:
+        type: decimal
+        description: Required storage temperature in Celsius
+        required: true
+        example: 4.5
+      aging_period_days:
+        type: integer
+        description: Number of days the cheese has been or needs to be aged
+        required: false
+        example: 365
+      expiration_date:
+        type: date
+        description: Date when the cheese expires
+        required: true
+        example: 2026-06-30
+      last_updated:
+        type: timestamp
+        description: Timestamp when the record was last updated
+        required: true
+        example: 2026-01-03T10:30:00Z
+
+quality:
+  type: SodaCL
+  specification:
+    checks for cheese_inventory:
+      # Freshness - data should be updated daily
+      - freshness(last_updated) < 1d
+      # Completeness - critical fields must not be null
+      - missing_count(cheese_id) = 0
+      - missing_count(cheese_name) = 0
+      - missing_count(quantity_in_stock) = 0
+      - missing_count(unit_price) = 0
+      - missing_count(expiration_date) = 0
+      # Uniqueness - cheese_id must be unique
+      - duplicate_count(cheese_id) = 0
+      # Validity - check value constraints
+      - invalid_count(cheese_type) = 0:
+          valid values: ['hard', 'soft', 'semi-hard', 'semi-soft', 'blue', 'fresh', 'aged']
+      - min(quantity_in_stock) >= 0
+      - min(unit_price) > 0
+      - invalid_count(unit_of_measure) = 0:
+          valid values: ['kg', 'lbs', 'wheels', 'blocks', 'units']
+
+servicelevels:
+  availability:
+    description: The data is available 99.9% of the time during business hours
+    percentage: 99.9%
+  retention:
+    description: Historical inventory data is retained for 5 years for audit purposes
+    period: P5Y
+    unlimited: false
+  freshness:
+    description: Inventory data is updated daily at 2 AM UTC
+    threshold: 24h
+    timestampField: cheese_inventory.last_updated
+  frequency:
+    description: Data is refreshed daily via batch process
+    type: batch
+    interval: daily
+    cron: 0 2 * * *
+  support:
+    description: Support available during business hours
+    time: 9am to 5pm EST on business days
+    responseTime: 4h
